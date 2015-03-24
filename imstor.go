@@ -11,14 +11,9 @@
 package imstor
 
 import (
-	"bytes"
-	"errors"
 	"hash/crc64"
 	"image"
 	"io"
-	"log"
-
-	"github.com/vincent-petithory/dataurl"
 )
 
 var crcTable = crc64.MakeTable(crc64.ISO)
@@ -35,11 +30,6 @@ type storage struct {
 	formats []Format
 }
 
-type imageFile struct {
-	name  string
-	image image.Image
-}
-
 type Format interface {
 	Encode(io.Writer, image.Image) error
 	Decode(io.Reader) (image.Image, error)
@@ -47,42 +37,14 @@ type Format interface {
 	Extension() string
 }
 
-func (s storage) StoreDataURLString(str string) error {
-	dataURL, err := dataurl.DecodeString(str)
-	if err != nil {
-		return err
-	}
-	return s.storeDataURL(dataURL)
+type Storage interface {
+	StoreDataURLString(str string) error
+	Store(mediaType string, data []byte) error
 }
 
-func (s storage) storeDataURL(dataURL *dataurl.DataURL) error {
-	return s.Store(dataURL.MediaType.ContentType(), dataURL.Data)
-}
-
-func (s storage) Store(mediaType string, data []byte) error {
-	dataReader := bytes.NewReader(data)
-	checksum := getChecksum(data)
-	for _, format := range s.formats {
-		if mediaType == format.MediaType() {
-			return s.storeInFormat(dataReader, checksum, format)
-		}
+func New(conf Config, formats []Format) Storage {
+	return storage{
+		conf:    conf,
+		formats: formats,
 	}
-	return errors.New("Not a supported format!")
-}
-
-func (s storage) storeInFormat(r io.Reader, checksum string, f Format) error {
-	image, err := f.Decode(r)
-	if err != nil {
-		return err
-	}
-	copies := createCopies(image, s.conf.CopySizes)
-	folderPath := getAbsFolderPath(s.conf.RootPath, checksum)
-	if err = createFolder(folderPath); err != nil {
-		return err
-	}
-	if err = writeImageAndCopies(folderPath, image, copies, f); err != nil {
-		log.Println("Writing an image failed, but a new folder and some files may have already been created. Please check your filesystem for clutter.")
-		return err
-	}
-	return nil
 }

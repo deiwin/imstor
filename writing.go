@@ -11,6 +11,11 @@ import (
 	"github.com/nfnt/resize"
 )
 
+type imageFile struct {
+	name  string
+	image image.Image
+}
+
 func createCopies(image image.Image, sizes []Size) []imageFile {
 	copies := make([]imageFile, len(sizes))
 	for i, size := range sizes {
