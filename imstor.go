@@ -25,17 +25,29 @@ const (
 type storage struct {
 	conf    Config
 	formats []Format
+	resizer Resizer
 }
 
+// Storage is the engine that can be used to store images and retrieve their paths
 type Storage interface {
 	StoreDataURLString(str string) error
 	Store(mediaType string, data []byte) error
 }
 
+// New creates a storage engine using the default Resizer
 func New(conf Config, formats []Format) Storage {
 	return storage{
 		conf:    conf,
 		formats: formats,
+	}
+}
+
+// NewWithCustomResizer creates a storage engine using a custom resizer
+func NewWithCustomResizer(conf Config, formats []Format, resizer Resizer) Storage {
+	return storage{
+		conf:    conf,
+		formats: formats,
+		resizer: resizer,
 	}
 }
 

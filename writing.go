@@ -5,8 +5,6 @@ import (
 	"image"
 	"os"
 	"path/filepath"
-
-	"github.com/nfnt/resize"
 )
 
 const permission = 0640
@@ -16,10 +14,10 @@ type imageFile struct {
 	image image.Image
 }
 
-func createCopies(image image.Image, sizes []Size) []imageFile {
+func createCopies(image image.Image, sizes []Size, resizer Resizer) []imageFile {
 	copies := make([]imageFile, len(sizes))
 	for i, size := range sizes {
-		imageCopy := resize.Thumbnail(size.Width, size.Height, image, resize.Lanczos3)
+		imageCopy := resizer.Thumbnail(size.Width, size.Height, image)
 		copies[i] = imageFile{
 			name:  size.Name,
 			image: imageCopy,

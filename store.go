@@ -37,7 +37,7 @@ func (s storage) storeInFormat(r io.Reader, checksum string, f Format) error {
 	if err != nil {
 		return err
 	}
-	copies := createCopies(image, s.conf.CopySizes)
+	copies := createCopies(image, s.conf.CopySizes, s.resizer)
 	folderPath := getAbsFolderPath(s.conf.RootPath, checksum)
 	if err = createFolder(folderPath); err != nil {
 		return err
