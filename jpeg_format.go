@@ -10,6 +10,7 @@ var jpegEncodingOptions = &jpeg.Options{
 	Quality: jpeg.DefaultQuality,
 }
 
+// JPEGFormat decodes a jpeg image and encodes it as a JPEG with the extension jpg
 var JPEGFormat Format = jpegFormat{}
 
 type jpegFormat struct {

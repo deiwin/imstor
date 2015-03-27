@@ -7,6 +7,7 @@ import (
 	"io"
 )
 
+// PNG2JPEG format decodes an image from the PNG format and encodes it as a JPEG
 var PNG2JPEG Format = png2JPEG{}
 
 type png2JPEG struct {
