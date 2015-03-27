@@ -73,13 +73,38 @@ var _ = Describe("Imstor", func() {
 			}
 		}
 
-		It("should create a image and copies", func() {
+		BeforeEach(func() {
 			err := s.Store("image/jpeg", data)
 			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("should create a image and copies", func() {
 			expectImageFileToExist("original.jpg")
 			expectImageFileToExist("small.jpg")
 			expectImageFileToExist("large.jpg")
 			// most assertions are in mock objects
+		})
+
+		It("should return proper path for the original image", func() {
+			path, err := s.PathFor(checksum)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(path).To(Equal(filepath.Join(filepath.FromSlash(folderPath), "original.jpg")))
+
+		})
+
+		It("should return proper paths for different sizes", func() {
+			path, err := s.PathForSize(checksum, "small")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(path).To(Equal(filepath.Join(filepath.FromSlash(folderPath), "small.jpg")))
+
+			path, err = s.PathForSize(checksum, "large")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(path).To(Equal(filepath.Join(filepath.FromSlash(folderPath), "large.jpg")))
+		})
+
+		It("should not return a path for improper size (say a prefix of an actual size)", func() {
+			_, err := s.PathForSize(checksum, "smal")
+			Expect(err).To(HaveOccurred())
 		})
 	})
 })

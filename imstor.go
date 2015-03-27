@@ -11,9 +11,13 @@
 package imstor
 
 import (
+	"errors"
 	"fmt"
 	"hash/crc64"
+	"io/ioutil"
 	"path"
+	"path/filepath"
+	"strings"
 
 	"github.com/vincent-petithory/dataurl"
 )
@@ -34,8 +38,10 @@ type storage struct {
 type Storage interface {
 	Store(mediaType string, data []byte) error
 	StoreDataURL(string) error
-	Checksum(data []byte) string
+	Checksum([]byte) string
 	ChecksumDataURL(string) (string, error)
+	PathFor(checksum string) (string, error)
+	PathForSize(checksum, size string) (string, error)
 }
 
 // New creates a storage engine using the default Resizer
@@ -71,4 +77,32 @@ func (s storage) ChecksumDataURL(str string) (string, error) {
 func (s storage) Checksum(data []byte) string {
 	crc := crc64.Checksum(data, crcTable)
 	return fmt.Sprintf("%020d", crc)
+}
+
+func (s storage) PathFor(sum string) (string, error) {
+	return s.PathForSize(sum, originalImageName)
+}
+
+func (s storage) PathForSize(sum, size string) (string, error) {
+	dir := getStructuredFolderPath(sum)
+	absDirPath := filepath.Join(s.conf.RootPath, filepath.FromSlash(dir))
+	files, err := ioutil.ReadDir(absDirPath)
+	if err != nil {
+		return "", err
+	}
+	for _, file := range files {
+		if !file.IsDir() && hasNameWithoutExtension(file.Name(), size) {
+			return filepath.Join(dir, file.Name()), nil
+		}
+	}
+	return "", errors.New("File not found!")
+}
+
+func hasNameWithoutExtension(fileName, name string) bool {
+	lastDot := strings.LastIndex(fileName, ".")
+	if lastDot == -1 {
+		return false
+	}
+	nameWithoutExtension := fileName[:lastDot]
+	return nameWithoutExtension == name
 }
