@@ -14,6 +14,8 @@ import (
 	"fmt"
 	"hash/crc64"
 	"path"
+
+	"github.com/vincent-petithory/dataurl"
 )
 
 var crcTable = crc64.MakeTable(crc64.ISO)
@@ -30,8 +32,10 @@ type storage struct {
 
 // Storage is the engine that can be used to store images and retrieve their paths
 type Storage interface {
-	StoreDataURLString(str string) error
 	Store(mediaType string, data []byte) error
+	StoreDataURL(string) error
+	Checksum(data []byte) string
+	ChecksumDataURL(string) (string, error)
 }
 
 // New creates a storage engine using the default Resizer
@@ -56,7 +60,15 @@ func getStructuredFolderPath(checksum string) string {
 	return path.Join(lvl1Dir, checksum)
 }
 
-func getChecksum(data []byte) string {
+func (s storage) ChecksumDataURL(str string) (string, error) {
+	dataURL, err := dataurl.DecodeString(str)
+	if err != nil {
+		return "", err
+	}
+	return s.Checksum(dataURL.Data), nil
+}
+
+func (s storage) Checksum(data []byte) string {
 	crc := crc64.Checksum(data, crcTable)
 	return fmt.Sprintf("%020d", crc)
 }

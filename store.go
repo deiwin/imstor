@@ -9,21 +9,17 @@ import (
 	"github.com/vincent-petithory/dataurl"
 )
 
-func (s storage) StoreDataURLString(str string) error {
+func (s storage) StoreDataURL(str string) error {
 	dataURL, err := dataurl.DecodeString(str)
 	if err != nil {
 		return err
 	}
-	return s.storeDataURL(dataURL)
-}
-
-func (s storage) storeDataURL(dataURL *dataurl.DataURL) error {
 	return s.Store(dataURL.MediaType.ContentType(), dataURL.Data)
 }
 
 func (s storage) Store(mediaType string, data []byte) error {
 	dataReader := bytes.NewReader(data)
-	checksum := getChecksum(data)
+	checksum := s.Checksum(data)
 	for _, format := range s.formats {
 		if mediaType == format.EncodedExtension() {
 			return s.storeInFormat(dataReader, checksum, format)
