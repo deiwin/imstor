@@ -4,10 +4,12 @@
 // CRC 64 checksum of the original image. The last 2 characters of the checksum
 // are used as the lvl 1 directory name.
 //
-// Example folder name and contents, given this checksum: 08446744073709551615:
-// /configured/root/path/15/08446744073709551615/original.jpeg
-// /configured/root/path/15/08446744073709551615/small.jpeg
-// /configured/root/path/15/08446744073709551615/large.jpeg
+// Example folder name and contents, given the checksum 08446744073709551615 and
+// sizes named "small" and "large":
+//
+//  /configured/root/path/15/08446744073709551615/original.jpeg
+//  /configured/root/path/15/08446744073709551615/small.jpeg
+//  /configured/root/path/15/08446744073709551615/large.jpeg
 package imstor
 
 import (
