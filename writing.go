@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-const permission = 0640
+const permission = 0750
 
 type imageFile struct {
 	name  string
@@ -36,7 +36,7 @@ func writeImageAndCopies(folder string, original image.Image, copies []imageFile
 
 func writeImageFiles(folder string, imageFiles []imageFile, f Format) error {
 	for _, imageFile := range imageFiles {
-		fileName := fmt.Sprintf("%s.%s", imageFile.name, f.DecodableMediaType())
+		fileName := fmt.Sprintf("%s.%s", imageFile.name, f.EncodedExtension())
 		path := filepath.Join(folder, fileName)
 		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, permission)
 		if err != nil {
