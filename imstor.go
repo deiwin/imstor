@@ -11,30 +11,20 @@
 package imstor
 
 import (
+	"fmt"
 	"hash/crc64"
-	"image"
-	"io"
+	"path"
 )
 
 var crcTable = crc64.MakeTable(crc64.ISO)
 
 const (
 	originalImageName = "original"
-	pngExtension      = "png"
-	jpegExtension     = "jpeg"
-	permission        = 0640
 )
 
 type storage struct {
 	conf    Config
 	formats []Format
-}
-
-type Format interface {
-	Encode(io.Writer, image.Image) error
-	Decode(io.Reader) (image.Image, error)
-	MediaType() string
-	Extension() string
 }
 
 type Storage interface {
@@ -47,4 +37,14 @@ func New(conf Config, formats []Format) Storage {
 		conf:    conf,
 		formats: formats,
 	}
+}
+
+func getStructuredFolderPath(checksum string) string {
+	lvl1Dir := checksum[len(checksum)-2:]
+	return path.Join(lvl1Dir, checksum)
+}
+
+func getChecksum(data []byte) string {
+	crc := crc64.Checksum(data, crcTable)
+	return fmt.Sprintf("%020d", crc)
 }

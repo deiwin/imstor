@@ -25,7 +25,7 @@ func (s storage) Store(mediaType string, data []byte) error {
 	dataReader := bytes.NewReader(data)
 	checksum := getChecksum(data)
 	for _, format := range s.formats {
-		if mediaType == format.MediaType() {
+		if mediaType == format.EncodedExtension() {
 			return s.storeInFormat(dataReader, checksum, format)
 		}
 	}

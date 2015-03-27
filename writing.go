@@ -2,14 +2,14 @@ package imstor
 
 import (
 	"fmt"
-	"hash/crc64"
 	"image"
 	"os"
-	"path"
 	"path/filepath"
 
 	"github.com/nfnt/resize"
 )
+
+const permission = 0640
 
 type imageFile struct {
 	name  string
@@ -38,7 +38,7 @@ func writeImageAndCopies(folder string, original image.Image, copies []imageFile
 
 func writeImageFiles(folder string, imageFiles []imageFile, f Format) error {
 	for _, imageFile := range imageFiles {
-		fileName := fmt.Sprintf("%s.%s", imageFile.name, f.Extension())
+		fileName := fmt.Sprintf("%s.%s", imageFile.name, f.DecodableMediaType())
 		path := filepath.Join(folder, fileName)
 		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, permission)
 		if err != nil {
@@ -54,16 +54,6 @@ func writeImageFiles(folder string, imageFiles []imageFile, f Format) error {
 func getAbsFolderPath(rootPath string, checksum string) string {
 	structuredFolderPath := filepath.FromSlash(getStructuredFolderPath(checksum))
 	return filepath.Join(rootPath, structuredFolderPath)
-}
-
-func getStructuredFolderPath(checksum string) string {
-	lvl1Dir := checksum[len(checksum)-2:]
-	return path.Join(lvl1Dir, checksum)
-}
-
-func getChecksum(data []byte) string {
-	crc := crc64.Checksum(data, crcTable)
-	return fmt.Sprintf("%020d", crc)
 }
 
 func createFolder(path string) error {
