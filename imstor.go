@@ -101,10 +101,7 @@ func (s storage) PathForSize(sum, size string) (string, error) {
 }
 
 func hasNameWithoutExtension(fileName, name string) bool {
-	lastDot := strings.LastIndex(fileName, ".")
-	if lastDot == -1 {
-		return false
-	}
-	nameWithoutExtension := fileName[:lastDot]
+	extension := path.Ext(fileName)
+	nameWithoutExtension := strings.TrimSuffix(fileName, extension)
 	return nameWithoutExtension == name
 }
