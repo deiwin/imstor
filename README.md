@@ -7,7 +7,7 @@ A Golang image storage engine. Used to create and store different sizes/thumbnai
 
 **Imstor** enables you to create copies (or thumbnails) of your images and stores
 them along with the original image on your filesystem. The image and its
-copies are are stored in a file structure based on the (zero-prefixed, decimal)
+copies are stored in a file structure based on the (zero-prefixed, decimal)
 CRC 64 checksum of the original image. The last 2 characters of the checksum
 are used as the lvl 1 directory name.
 
