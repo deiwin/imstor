@@ -1,7 +1,9 @@
 # Imstor
 A Golang image storage engine. Used to create and store different sizes/thumbnails of user uploaded images.
 
-[![Build Status](https://travis-ci.org/deiwin/imstor.svg?branch=master)](https://travis-ci.org/deiwin/imstor) [![GoDoc](https://godoc.org/github.com/deiwin/imstor?status.svg)](https://godoc.org/github.com/deiwin/imstor)
+[![Build Status](https://travis-ci.org/deiwin/imstor.svg?branch=master)](https://travis-ci.org/deiwin/imstor)
+[![Coverage](http://gocover.io/_badge/github.com/deiwin/imstor?0)](http://gocover.io/github.com/deiwin/imstor)
+[![GoDoc](https://godoc.org/github.com/deiwin/imstor?status.svg)](https://godoc.org/github.com/deiwin/imstor)
 
 ## Description
 
