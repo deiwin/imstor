@@ -32,7 +32,6 @@ const (
 
 type storage struct {
 	conf    Config
-	formats []Format
 	resizer Resizer
 }
 
@@ -47,18 +46,16 @@ type Storage interface {
 }
 
 // New creates a storage engine using the default Resizer
-func New(conf Config, formats []Format) Storage {
+func New(conf Config) Storage {
 	return storage{
-		conf:    conf,
-		formats: formats,
+		conf: conf,
 	}
 }
 
 // NewWithCustomResizer creates a storage engine using a custom resizer
-func NewWithCustomResizer(conf Config, formats []Format, resizer Resizer) Storage {
+func NewWithCustomResizer(conf Config, resizer Resizer) Storage {
 	return storage{
 		conf:    conf,
-		formats: formats,
 		resizer: resizer,
 	}
 }

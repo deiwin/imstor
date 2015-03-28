@@ -20,7 +20,7 @@ func (s storage) StoreDataURL(str string) error {
 func (s storage) Store(mediaType string, data []byte) error {
 	dataReader := bytes.NewReader(data)
 	checksum := s.Checksum(data)
-	for _, format := range s.formats {
+	for _, format := range s.conf.Formats {
 		if mediaType == format.DecodableMediaType() {
 			return s.storeInFormat(dataReader, checksum, format)
 		}

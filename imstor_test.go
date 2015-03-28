@@ -31,20 +31,24 @@ var (
 			Width:  300,
 		},
 	}
+	formats = []imstor.Format{
+		png2JPEG{},
+		jpegFormat{},
+	}
 )
 
 var _ = Describe("Imstor", func() {
 	var s imstor.Storage
 	BeforeEach(func() {
 		var err error
-		formats := []imstor.Format{png2JPEG{}, jpegFormat{}}
 		tempDir, err = ioutil.TempDir("", "imstor-test")
 		Expect(err).NotTo(HaveOccurred())
 		conf := imstor.Config{
 			RootPath:  tempDir,
 			CopySizes: sizes,
+			Formats:   formats,
 		}
-		s = imstor.NewWithCustomResizer(conf, formats, mockResizer{})
+		s = imstor.NewWithCustomResizer(conf, mockResizer{})
 	})
 
 	AfterEach(func() {

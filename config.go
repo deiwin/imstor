@@ -1,6 +1,11 @@
 package imstor
 
-import "github.com/deiwin/gonfigure"
+import (
+	"image"
+	"io"
+
+	"github.com/deiwin/gonfigure"
+)
 
 var (
 	rootPathEnvProperty = gonfigure.NewRequiredEnvProperty("IMSTOR_ROOT_PATH")
@@ -9,12 +14,14 @@ var (
 type Config struct {
 	RootPath  string
 	CopySizes []Size
+	Formats   []Format
 }
 
-func NewConfig(copySizes []Size) *Config {
+func NewConfig(copySizes []Size, formats []Format) *Config {
 	return &Config{
 		RootPath:  rootPathEnvProperty.Value(),
 		CopySizes: copySizes,
+		Formats:   formats,
 	}
 }
 
@@ -24,4 +31,13 @@ type Size struct {
 	Name   string
 	Height uint
 	Width  uint
+}
+
+// A Format describes how an image of a certaing mimetype can be decoded and
+// then encoded.
+type Format interface {
+	DecodableMediaType() string
+	Decode(io.Reader) (image.Image, error)
+	Encode(io.Writer, image.Image) error
+	EncodedExtension() string
 }
