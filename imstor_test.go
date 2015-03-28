@@ -96,6 +96,11 @@ var _ = Describe("Imstor", func() {
 
 		})
 
+		It("should return an error for an improper checksum", func() {
+			_, err := s.PathFor("somethingrandom")
+			Expect(err).To(HaveOccurred())
+		})
+
 		It("should return proper paths for different sizes", func() {
 			path, err := s.PathForSize(checksum, "small")
 			Expect(err).NotTo(HaveOccurred())
