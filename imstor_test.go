@@ -43,7 +43,7 @@ var _ = Describe("Imstor", func() {
 		var err error
 		tempDir, err = ioutil.TempDir("", "imstor-test")
 		Expect(err).NotTo(HaveOccurred())
-		conf := imstor.Config{
+		conf := &imstor.Config{
 			RootPath:  tempDir,
 			CopySizes: sizes,
 			Formats:   formats,
