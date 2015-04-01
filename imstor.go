@@ -48,7 +48,8 @@ type Storage interface {
 // New creates a storage engine using the default Resizer
 func New(conf *Config) Storage {
 	return storage{
-		conf: conf,
+		conf:    conf,
+		resizer: DefaultResizer,
 	}
 }
 
