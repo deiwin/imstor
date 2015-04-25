@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 )
 
+// rw-r-----
 const permission = 0750
 
 type imageFile struct {
@@ -55,6 +56,5 @@ func getAbsFolderPath(rootPath string, checksum string) string {
 }
 
 func createFolder(path string) error {
-	// rw-r-----
 	return os.MkdirAll(path, permission)
 }
