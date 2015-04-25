@@ -89,11 +89,61 @@ var _ = Describe("Imstor", func() {
 			// most assertions are in mock objects
 		})
 
+		Context("with new configuration size added", func() {
+			BeforeEach(func() {
+				updatedSizes := append(sizes, imstor.Size{
+					Name:   "newFormat",
+					Height: 16,
+					Width:  16,
+				})
+				conf := &imstor.Config{
+					RootPath:  tempDir,
+					CopySizes: updatedSizes,
+					Formats:   formats,
+				}
+				s = imstor.NewWithCustomResizer(conf, mockResizer{})
+			})
+
+			Describe("storing the same image", func() {
+				var err error
+				BeforeEach(func() {
+					err = s.Store("image/jpeg", data)
+				})
+
+				It("should return without an error", func() {
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("should still have the image and copies plus the new one", func() {
+					expectImageFileToExist("original.jpg")
+					expectImageFileToExist("small.jpg")
+					expectImageFileToExist("large.jpg")
+					expectImageFileToExist("newFormat.jpg")
+				})
+			})
+		})
+
+		Describe("storing the same image", func() {
+			var err error
+			BeforeEach(func() {
+				err = s.Store("image/jpeg", data)
+			})
+
+			It("should return without an error", func() {
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should still have the image and copies", func() {
+				expectImageFileToExist("original.jpg")
+				expectImageFileToExist("small.jpg")
+				expectImageFileToExist("large.jpg")
+			})
+		})
+
 		It("should return proper path for the original image", func() {
 			path, err := s.PathFor(checksum)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(path).To(Equal(filepath.Join(filepath.FromSlash(folderPath), "original.jpg")))
-
 		})
 
 		It("should return an error for an improper checksum", func() {

@@ -39,7 +39,7 @@ func writeImageFiles(folder string, imageFiles []imageFile, f Format) error {
 		fileName := fmt.Sprintf("%s.%s", imageFile.name, f.EncodedExtension())
 		path := filepath.Join(folder, fileName)
 		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, permission)
-		if err != nil {
+		if err != nil && !os.IsExist(err) {
 			return err
 		}
 		if err = f.Encode(file, imageFile.image); err != nil {

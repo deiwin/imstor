@@ -13,6 +13,7 @@ import (
 
 var smallImg = image.NewGray16(image.Rect(0, 0, 2, 2))
 var largeImg = image.NewGray16(image.Rect(0, 0, 4, 4))
+var newSizeImg = image.NewGray16(image.Rect(0, 0, 5, 5))
 
 type png2JPEG struct {
 	imstor.Format
@@ -48,6 +49,8 @@ func (f jpegFormat) Encode(w io.Writer, i image.Image) error {
 		expectToBeFile(w, "large.jpg")
 	} else if i == img {
 		expectToBeFile(w, "original.jpg")
+	} else if i == newSizeImg {
+		expectToBeFile(w, "newFormat.jpg")
 	} else {
 		Fail("an unexpected image")
 	}
@@ -73,6 +76,8 @@ func (r mockResizer) Thumbnail(w, h uint, i image.Image) image.Image {
 		return smallImg
 	} else if w == 300 && h == 300 {
 		return largeImg
+	} else if w == 16 && h == 16 {
+		return newSizeImg
 	}
 	Fail("unexpected size")
 	return nil
