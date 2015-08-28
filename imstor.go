@@ -17,6 +17,7 @@ import (
 	"fmt"
 	"hash/crc64"
 	"io/ioutil"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -43,6 +44,7 @@ type Storage interface {
 	ChecksumDataURL(string) (string, error)
 	PathFor(checksum string) (string, error)
 	PathForSize(checksum, size string) (string, error)
+	HasSizesForChecksum(checksum string, sizes []string) (bool, error)
 }
 
 // New creates a storage engine using the default Resizer
@@ -96,6 +98,27 @@ func (s storage) PathForSize(sum, size string) (string, error) {
 		}
 	}
 	return "", errors.New("File not found!")
+}
+
+func (s storage) HasSizesForChecksum(sum string, sizes []string) (bool, error) {
+	dir := getStructuredFolderPath(sum)
+	absDirPath := filepath.Join(s.conf.RootPath, filepath.FromSlash(dir))
+	files, err := ioutil.ReadDir(absDirPath)
+	if os.IsNotExist(err) {
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+LoopSizes:
+	for _, size := range sizes {
+		for _, file := range files {
+			if !file.IsDir() && hasNameWithoutExtension(file.Name(), size) {
+				continue LoopSizes
+			}
+		}
+		return false, nil
+	}
+	return true, nil
 }
 
 func hasNameWithoutExtension(fileName, name string) bool {

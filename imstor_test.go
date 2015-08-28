@@ -161,6 +161,26 @@ var _ = Describe("Imstor", func() {
 			Expect(path).To(Equal(filepath.Join(filepath.FromSlash(folderPath), "large.jpg")))
 		})
 
+		Describe("HasSizesForChecksum", func() {
+			It("should return true if the sizes exist for that checksum", func() {
+				hasSizes, err := s.HasSizesForChecksum(checksum, []string{"small", "large"})
+				Expect(err).NotTo(HaveOccurred())
+				Expect(hasSizes).To(BeTrue())
+			})
+
+			It("should return false if any of the sizes don't exist for that checksum", func() {
+				hasSizes, err := s.HasSizesForChecksum(checksum, []string{"smallish", "large"})
+				Expect(err).NotTo(HaveOccurred())
+				Expect(hasSizes).To(BeFalse())
+			})
+
+			It("should return false for a random checksum", func() {
+				hasSizes, err := s.HasSizesForChecksum("arandomchecksum", []string{"small", "large"})
+				Expect(err).NotTo(HaveOccurred())
+				Expect(hasSizes).To(BeFalse())
+			})
+		})
+
 		It("should not return a path for improper size (say a prefix of an actual size)", func() {
 			_, err := s.PathForSize(checksum, "smal")
 			Expect(err).To(HaveOccurred())
