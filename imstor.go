@@ -16,6 +16,9 @@ import (
 	"errors"
 	"fmt"
 	"hash/crc64"
+	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"io/ioutil"
 	"os"
 	"path"
@@ -45,6 +48,7 @@ type Storage interface {
 	PathFor(checksum string) (string, error)
 	PathForSize(checksum, size string) (string, error)
 	HasSizesForChecksum(checksum string, sizes []string) (bool, error)
+	GetSize(checksum, size string) (image.Image, error)
 }
 
 // New creates a storage engine using the default Resizer
@@ -125,4 +129,24 @@ func hasNameWithoutExtension(fileName, name string) bool {
 	extension := path.Ext(fileName)
 	nameWithoutExtension := strings.TrimSuffix(fileName, extension)
 	return nameWithoutExtension == name
+}
+
+func (s storage) GetSize(sum, size string) (image.Image, error) {
+	relPath, err := s.PathForSize(sum, size)
+	if err != nil {
+		return nil, err
+	}
+	absPath := filepath.Join(s.conf.RootPath, relPath)
+
+	file, err := os.Open(absPath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	// TODO: currently relies on `_ "image/jpeg"` to be imported here. The Format type needs some rework
+	// before it can be used to properly decode written files. (Say, having only a PNG2JPEG Format would not
+	// work, because the Format doesn't know how to decode the jpeg file)
+	image, _, err := image.Decode(file)
+	return image, err
 }
